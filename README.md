@@ -1,43 +1,75 @@
 # Parking RL Lab — Stable
 
-A reinforcement-learning laboratory for autonomous parking with **Double DQN, PPO and SAC**, discrete and continuous control, collision geometry, configurable scenarios, reproducible evaluation, checkpoints and replay visualization.
+A runnable autonomous-parking reinforcement-learning benchmark with **DQN, PPO and SAC** over a shared Gymnasium environment.
 
-> Migration note: the recovered full simulator is being separated from its historical `neuralTrainer` branch into this dedicated repository. `main` is the stable portfolio surface; `experimental` carries curriculum and residual-RL work.
+`main` is deliberately conservative: fixed action spaces, reproducible seeds and standard Stable-Baselines3 implementations. The `experimental` branch is reserved for the recovered coarse-to-fine curriculum, residual control and harder scenario research.
 
-## Algorithm suite
+## Algorithm matrix
 
-| Algorithm | Action modes | Role |
+| Algorithm | Supported action space | Example |
 |---|---|---|
-| Double DQN + Dueling Network | `DISCRETE_9`, `DISCRETE_43` | value-based discrete baseline |
-| PPO | discrete + continuous | general actor-critic baseline |
-| SAC | continuous | off-policy continuous-control baseline |
+| DQN | `discrete9`, `discrete43` | `python train.py --algorithm dqn --action-mode discrete9` |
+| PPO | discrete or continuous | `python train.py --algorithm ppo --action-mode continuous` |
+| SAC | `continuous` | `python train.py --algorithm sac --action-mode continuous` |
 
-## Stable release goals
+The repository does not force DQN into native continuous control or SAC into a discrete action space merely to make a bigger feature table.
 
-- deterministic seed control
-- 9- and 43-command action spaces
-- native continuous steering/throttle
-- rotated-rectangle collision checks using SAT
-- SIMPLE / WALLS / RANDOM / custom JSON scenarios
-- multi-car environment support
-- checkpoints, CSV logs and evaluation utilities
-- smoke tests and CI
+## Environment
 
-## Experimental branch
+`parking_env.py` implements a Gymnasium environment with:
 
-The `experimental` branch is reserved for:
+- randomized start and target poses;
+- 9-command and 43-command discrete action tables;
+- native two-dimensional continuous control;
+- lightweight vehicle kinematics;
+- normalized geometric observations;
+- `approach → align → settle` phase features;
+- progress-based shaping;
+- terminal parking success;
+- out-of-bounds and timeout termination;
+- deterministic reset seeds.
 
-- curriculum `9 → 43 → continuous`
-- annealed discrete-to-continuous execution
-- residual RL over a geometric controller
-- hierarchical `approach → align → settle` state
-- harder trap/random scenarios
-- multi-car ablations
+The stable observation contains position, heading, speed, target displacement/distance, target heading error and a three-value phase indicator.
 
-## Evaluation
+## Install
 
-Results should be reported over held-out seeds with parking success rate, collision rate, timeout rate, final position/alignment error and episode length. Reward alone is not treated as task success.
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+## Train
+
+```bash
+python train.py --algorithm dqn --action-mode discrete9 --timesteps 100000 --seed 42
+python train.py --algorithm ppo --action-mode discrete43 --timesteps 100000 --seed 42
+python train.py --algorithm ppo --action-mode continuous --timesteps 100000 --seed 42
+python train.py --algorithm sac --action-mode continuous --timesteps 100000 --seed 42
+```
+
+Checkpoints are written beneath `artifacts/`. Evaluation uses a different deterministic seed range from training.
+
+## Stable vs experimental
+
+### `main`
+
+Use this branch when you want an easy-to-run algorithm comparison with minimal custom RL machinery.
+
+### `experimental`
+
+The experimental line is intended for the recovered research features:
+
+- curriculum `9 → 43 → continuous`;
+- discrete-to-continuous annealing;
+- residual RL over a geometric controller;
+- harder trap/random scenarios;
+- multi-car extensions and ablations.
+
+## Evaluation protocol
+
+Do not report one lucky reward curve. Use multiple train seeds and disjoint evaluation seeds, then report parking success, final position/alignment error, timeout/out-of-bounds rate, episode length and return distribution.
 
 ## Provenance
 
-This is a personal autonomous-parking RL project recovered from earlier development work and reorganized as a standalone portfolio repository. It is unrelated to employer code or data.
+This is a personal parking-RL project reconstructed and reorganized from earlier personal development work. It contains no employer code, data or scenarios.
