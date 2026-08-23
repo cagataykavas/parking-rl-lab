@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: ruff check parking_env.py parking_env_v2.py curriculum.py train.py train_v2.py tests
+      - run: pytest -q
+      - name: Smoke check training profiles
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from train_v2 import load_config, make_env, build_model
+          for path in Path('configs').glob('*.yaml'):
+              cfg = load_config(path)
+              env = make_env(cfg['action_mode'], int(cfg.get('curriculum', {}).get('initial_level', 0)), int(cfg.get('seed', 42)))
+              model = build_model(cfg, env)
+              assert model is not None
+              print(path, 'ok')
+          PY
