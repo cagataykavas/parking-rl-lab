@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1"><stop stop-color="#07111f"/><stop offset="1" stop-color="#10243a"/></linearGradient>
+    <linearGradient id="car" x1="0" x2="1"><stop stop-color="#61dafb"/><stop offset="1" stop-color="#7c8cff"/></linearGradient>
+  </defs>
+  <rect width="1200" height="620" rx="28" fill="url(#bg)"/>
+  <text x="60" y="64" fill="#fff" font-family="Arial" font-size="30" font-weight="700">Parking RL Environment V2</text>
+  <text x="60" y="96" fill="#9db0c8" font-family="Arial" font-size="16">LIDAR observation · obstacle collisions · curriculum difficulty · discrete / continuous control</text>
+  <rect x="60" y="130" width="780" height="430" rx="18" fill="#0b1728" stroke="#28425f" stroke-width="2"/>
+  <rect x="680" y="330" width="120" height="72" rx="8" fill="none" stroke="#51d88a" stroke-width="5" stroke-dasharray="10 8"/>
+  <text x="704" y="320" fill="#51d88a" font-family="Arial" font-size="15">target slot</text>
+  <rect x="180" y="185" width="140" height="58" rx="8" fill="#34465b"/><rect x="400" y="440" width="165" height="65" rx="8" fill="#34465b"/>
+  <rect x="550" y="185" width="90" height="130" rx="8" fill="#34465b"/><rect x="270" y="350" width="105" height="115" rx="8" fill="#34465b"/>
+  <g transform="translate(470 335) rotate(-18)">
+    <rect x="-38" y="-18" width="76" height="36" rx="9" fill="url(#car)" stroke="#d7f5ff" stroke-width="2"/>
+    <circle cx="-24" cy="-19" r="5" fill="#111"/><circle cx="24" cy="-19" r="5" fill="#111"/><circle cx="-24" cy="19" r="5" fill="#111"/><circle cx="24" cy="19" r="5" fill="#111"/>
+    <g stroke="#65bfff" stroke-width="2" opacity="0.58">
+      <line x1="0" y1="0" x2="170" y2="0"/><line x1="0" y1="0" x2="157" y2="65"/><line x1="0" y1="0" x2="120" y2="120"/><line x1="0" y1="0" x2="65" y2="157"/>
+      <line x1="0" y1="0" x2="0" y2="170"/><line x1="0" y1="0" x2="-65" y2="157"/><line x1="0" y1="0" x2="-120" y2="120"/><line x1="0" y1="0" x2="-157" y2="65"/>
+      <line x1="0" y1="0" x2="-170" y2="0"/><line x1="0" y1="0" x2="-157" y2="-65"/><line x1="0" y1="0" x2="-120" y2="-120"/><line x1="0" y1="0" x2="-65" y2="-157"/>
+      <line x1="0" y1="0" x2="0" y2="-170"/><line x1="0" y1="0" x2="65" y2="-157"/><line x1="0" y1="0" x2="120" y2="-120"/><line x1="0" y1="0" x2="157" y2="-65"/>
+    </g>
+  </g>
+  <path d="M500 330 C560 310 610 335 665 360" fill="none" stroke="#ffc857" stroke-width="4" stroke-dasharray="9 8"/>
+  <text x="515" y="295" fill="#ffc857" font-family="Arial" font-size="14">learned trajectory</text>
+  <rect x="880" y="130" width="260" height="430" rx="18" fill="#0b1728" stroke="#28425f" stroke-width="2"/>
+  <text x="910" y="175" fill="#fff" font-family="Arial" font-size="21" font-weight="700">Training stack</text>
+  <g font-family="Arial" font-size="16">
+    <text x="910" y="220" fill="#61dafb">DQN</text><text x="970" y="220" fill="#9db0c8">Discrete 9 / 43</text>
+    <text x="910" y="255" fill="#61dafb">PPO</text><text x="970" y="255" fill="#9db0c8">Discrete / continuous</text>
+    <text x="910" y="290" fill="#61dafb">SAC</text><text x="970" y="290" fill="#9db0c8">Continuous</text>
+    <text x="910" y="345" fill="#51d88a">Curriculum 0</text><text x="1040" y="345" fill="#9db0c8">approach</text>
+    <text x="910" y="377" fill="#51d88a">Curriculum 1</text><text x="1040" y="377" fill="#9db0c8">sparse lot</text>
+    <text x="910" y="409" fill="#51d88a">Curriculum 2</text><text x="1040" y="409" fill="#9db0c8">obstacles</text>
+    <text x="910" y="441" fill="#51d88a">Curriculum 3</text><text x="1040" y="441" fill="#9db0c8">hard start</text>
+  </g>
+  <line x1="910" y1="475" x2="1110" y2="475" stroke="#28425f"/>
+  <text x="910" y="510" fill="#fff" font-family="Arial" font-size="16" font-weight="700">Evaluation</text>
+  <text x="910" y="538" fill="#9db0c8" font-family="Arial" font-size="14">success · collision · reward</text>
+</svg>
