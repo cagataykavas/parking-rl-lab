@@ -3,5 +3,6 @@ numpy>=2.0
 PyYAML>=6.0
 stable-baselines3>=2.4
 torch>=2.2
+tensorboard>=2.18
 pytest>=8.0
 ruff>=0.12
