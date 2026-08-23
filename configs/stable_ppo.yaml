@@ -1,0 +1,19 @@
+name: stable_ppo_curriculum
+algorithm: ppo
+action_mode: discrete9
+timesteps: 300000
+seed: 42
+curriculum:
+  enabled: true
+  initial_level: 0
+  max_level: 3
+  window: 100
+  minimum_episodes: 60
+  promotion_success_rate: 0.68
+model:
+  learning_rate: 0.0003
+  n_steps: 2048
+  batch_size: 256
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
