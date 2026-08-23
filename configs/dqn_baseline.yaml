@@ -1,0 +1,17 @@
+name: dqn_discrete_baseline
+algorithm: dqn
+action_mode: discrete9
+timesteps: 250000
+seed: 42
+curriculum:
+  enabled: false
+  initial_level: 1
+model:
+  learning_rate: 0.0003
+  buffer_size: 150000
+  learning_starts: 5000
+  batch_size: 256
+  gamma: 0.99
+  target_update_interval: 1000
+  exploration_fraction: 0.35
+  exploration_final_eps: 0.04
