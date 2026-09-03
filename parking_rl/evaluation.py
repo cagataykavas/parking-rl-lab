@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import json
 import math
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from statistics import mean
-from typing import Iterable
 
 import numpy as np
 
@@ -114,8 +114,10 @@ def _action_components(env: ParkingEnvV2, action: np.ndarray | int) -> tuple[flo
     return float(materialized[0]), float(materialized[1])
 
 
-def _min_lidar(env: ParkingEnvV2) -> float:
-    lidar = np.asarray(env._lidar(), dtype=float)  # noqa: SLF001 - evaluation instrumentation
+def _min_lidar(observation: np.ndarray, lidar_rays: int) -> float:
+    if lidar_rays <= 0 or observation.size < lidar_rays:
+        return 1.0
+    lidar = np.asarray(observation[-lidar_rays:], dtype=float)
     return float(np.min(lidar)) if lidar.size else 1.0
 
 
@@ -194,7 +196,7 @@ def run_episode(
         previous_action = action_vector
         steering_values.append(abs(steering))
         throttle_values.append(abs(throttle))
-        lidar_minima.append(_min_lidar(env))
+        lidar_minima.append(_min_lidar(observation, env.cfg.lidar_rays))
         reward_sum += float(reward)
 
     quality = _quality(env)
