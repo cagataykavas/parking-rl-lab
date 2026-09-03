@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from typing import ClassVar
 
 import gymnasium as gym
 import numpy as np
@@ -68,7 +69,7 @@ class ParkingEnvV2(gym.Env):
     on RL design choices rather than a heavyweight vehicle simulator.
     """
 
-    metadata = {"render_modes": ["rgb_array"]}
+    metadata: ClassVar[dict[str, list[str]]] = {"render_modes": ["rgb_array"]}
 
     def __init__(self, config: ParkingV2Config | None = None):
         super().__init__()
