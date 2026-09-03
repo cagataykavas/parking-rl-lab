@@ -25,16 +25,12 @@ class ControllerTelemetry:
     distance: float = 0.0
     steering: float = 0.0
     throttle: float = 0.0
+    forward_clearance: float = 1.0
     phase: str = "approach"
 
 
 class ZeroPolicy:
-    """No-op reference policy.
-
-    A deliberately weak baseline is useful because environment changes should not
-    accidentally make "do nothing" look successful. It also catches termination
-    and timeout regressions without depending on an RL library.
-    """
+    """No-op reference policy for environment regression checks."""
 
     name = "zero"
 
@@ -72,7 +68,7 @@ class RandomPolicy:
 class GreedyParkingController:
     """Privileged geometric controller used as an engineering reference baseline.
 
-    This is *not* presented as a learned agent. It reads the environment's true
+    This is not presented as a learned agent. It reads the environment's true
     pose/goal state and therefore acts as an oracle-style reference controller.
     Comparing PPO/DQN/SAC against it answers a more useful question than comparing
     against random alone: does a learned policy acquire at least simple geometric
@@ -124,6 +120,7 @@ class GreedyParkingController:
         target_heading: float,
         distance: float,
     ) -> tuple[float, str]:
+        del heading
         bearing = self._bearing(target_x - x, target_y - y)
         if distance > self.align_distance:
             return bearing, "approach"
@@ -135,14 +132,11 @@ class GreedyParkingController:
             return angle_wrap_deg(bearing + blend * delta), "align"
         return target_heading, "settle"
 
-    def _forward_clearance(self, env) -> float:
-        if not hasattr(env, "_lidar"):
+    @staticmethod
+    def _forward_clearance(observation: np.ndarray, lidar_rays: int) -> float:
+        if lidar_rays <= 0 or observation.size < lidar_rays:
             return 1.0
-        lidar = np.asarray(env._lidar(), dtype=float)  # noqa: SLF001 - intentional oracle baseline
-        if lidar.size == 0:
-            return 1.0
-        # Ray index zero starts behind/left because the environment spans -180..180.
-        # Select a narrow cone around the forward ray near offset 0 degrees.
+        lidar = np.asarray(observation[-lidar_rays:], dtype=float)
         midpoint = lidar.size // 2
         indices = [
             int(np.clip(midpoint + offset, 0, lidar.size - 1))
@@ -150,7 +144,11 @@ class GreedyParkingController:
         ]
         return float(np.min(lidar[indices]))
 
-    def _continuous_action(self, env) -> tuple[float, float]:
+    def _continuous_action(
+        self,
+        observation: np.ndarray,
+        env,
+    ) -> tuple[float, float]:
         x, y, heading, speed = map(float, env.state)
         target_x, target_y, target_heading = map(float, env.target)
         dx = target_x - x
@@ -175,7 +173,6 @@ class GreedyParkingController:
             heading_error = angle_wrap_deg(desired_reverse_heading - heading)
 
         raw_steering = float(np.clip(heading_error * self.heading_gain, -1.0, 1.0))
-        # Smooth the oracle slightly; this also makes action-change metrics meaningful.
         steering = 0.72 * raw_steering + 0.28 * self._last_steering
         self._last_steering = steering
 
@@ -186,14 +183,15 @@ class GreedyParkingController:
             heading_scale = float(np.clip(1.0 - abs(heading_error) / 120.0, 0.20, 1.0))
             throttle = direction * distance_scale * heading_scale
         else:
-            # Close to the slot, use a proportional settle command and brake any
-            # residual speed. The environment's throttle integrates into speed.
             position_command = float(np.clip(distance / self.final_distance, 0.0, 0.45))
             if distance < env.cfg.success_distance * 0.8:
                 position_command = 0.0
-            throttle = direction * position_command - self.brake_gain * speed / env.cfg.max_speed
+            throttle = (
+                direction * position_command
+                - self.brake_gain * speed / env.cfg.max_speed
+            )
 
-        forward_clearance = self._forward_clearance(env)
+        forward_clearance = self._forward_clearance(observation, env.cfg.lidar_rays)
         if forward_clearance < self.obstacle_brake_lidar and throttle > 0:
             throttle = min(throttle, -0.35)
 
@@ -205,6 +203,7 @@ class GreedyParkingController:
             distance=distance,
             steering=steering,
             throttle=throttle,
+            forward_clearance=forward_clearance,
             phase=phase,
         )
         return steering, throttle
@@ -222,8 +221,7 @@ class GreedyParkingController:
         return int(np.argmin(distances))
 
     def act(self, observation: np.ndarray, env) -> np.ndarray | int:
-        del observation
-        steering, throttle = self._continuous_action(env)
+        steering, throttle = self._continuous_action(observation, env)
         if env.action_table is not None:
             return self._nearest_discrete_action(env, steering, throttle)
         return np.asarray([steering, throttle], dtype=np.float32)
