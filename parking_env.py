@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from typing import ClassVar
 
 import gymnasium as gym
 import numpy as np
@@ -40,7 +41,7 @@ def build_action_table(levels: int) -> np.ndarray:
 
 
 class ParkingEnv(gym.Env):
-    metadata = {"render_modes": ["rgb_array"]}
+    metadata: ClassVar[dict[str, list[str]]] = {"render_modes": ["rgb_array"]}
 
     def __init__(self, config: ParkingConfig | None = None):
         super().__init__()
@@ -123,10 +124,15 @@ class ParkingEnv(gym.Env):
 
     def step(self, action):
         steering, throttle = self._decode_action(action)
-        x, y, heading, speed, previous_distance = map(float, self.state)
+        x, y, heading, speed, _previous_distance = map(float, self.state)
         distance_before = float(np.linalg.norm(self.target[:2] - self.state[:2]))
         speed = float(np.clip(speed + 0.18 * throttle, -self.cfg.max_speed, self.cfg.max_speed))
-        heading = angle_wrap_deg(heading + self.cfg.max_turn_deg * steering * (0.25 + abs(speed) / self.cfg.max_speed))
+        heading = angle_wrap_deg(
+            heading
+            + self.cfg.max_turn_deg
+            * steering
+            * (0.25 + abs(speed) / self.cfg.max_speed)
+        )
         x += speed * math.cos(math.radians(heading))
         y += speed * math.sin(math.radians(heading))
         self.state = np.asarray([x, y, heading, speed, distance_before], dtype=np.float32)
