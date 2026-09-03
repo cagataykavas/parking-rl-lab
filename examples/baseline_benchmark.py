@@ -16,11 +16,14 @@ def _fmt_interval(metric: dict[str, float]) -> str:
 
 
 def markdown_report(report: dict[str, object]) -> str:
+    note = (
+        "> Generated from deterministic environment rollouts. These are "
+        "reference-controller results, not trained PPO/DQN/SAC checkpoint claims."
+    )
     lines = [
         "# Parking RL reference-policy benchmark",
         "",
-        "> Generated from deterministic environment rollouts. These are reference-controller "
-        "results, not trained PPO/DQN/SAC checkpoint claims.",
+        note,
         "",
         "| Policy | Success | Collision | Timeout | Reward | Final pose score |",
         "|---|---:|---:|---:|---:|---:|",
