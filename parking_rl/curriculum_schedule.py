@@ -218,11 +218,11 @@ class CoarseToFineSchedule:
     def from_dict(cls, payload: dict[str, object]) -> CoarseToFineSchedule:
         raw_stages = payload.get("stages")
         if not isinstance(raw_stages, list):
-            raise ValueError("payload must contain a stages list")
+            raise TypeError("payload must contain a stages list")
         stages: list[CurriculumStage] = []
         for item in raw_stages:
             if not isinstance(item, dict):
-                raise ValueError("each stage must be an object")
+                raise TypeError("each stage must be an object")
             stages.append(
                 CurriculumStage(
                     name=str(item["name"]),
