@@ -17,10 +17,10 @@ from .dqn import (
 )
 
 __all__ = [
-    "DoubleDQNAgent",
     "DQNConfig",
     "DQNEvaluation",
     "DQNTrainingResult",
+    "DoubleDQNAgent",
     "DuelingQNetwork",
     "ReplayBuffer",
     "evaluate_dqn",
