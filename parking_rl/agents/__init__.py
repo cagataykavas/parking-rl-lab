@@ -6,10 +6,10 @@ checkpointing, and evaluation can be inspected and regression-tested.
 """
 
 from .dqn import (
+    DoubleDQNAgent,
     DQNConfig,
     DQNEvaluation,
     DQNTrainingResult,
-    DoubleDQNAgent,
     DuelingQNetwork,
     ReplayBuffer,
     evaluate_dqn,
@@ -17,10 +17,10 @@ from .dqn import (
 )
 
 __all__ = [
+    "DoubleDQNAgent",
     "DQNConfig",
     "DQNEvaluation",
     "DQNTrainingResult",
-    "DoubleDQNAgent",
     "DuelingQNetwork",
     "ReplayBuffer",
     "evaluate_dqn",
