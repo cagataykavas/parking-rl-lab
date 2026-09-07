@@ -4,14 +4,13 @@ import json
 import math
 import random
 from collections import deque
-from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
 import numpy as np
 import torch
-import torch.nn as nn
-import torch.nn.functional as functional
+from torch import nn
+from torch.nn import functional
 
 from parking_env_v2 import ParkingEnvV2, ParkingV2Config
 
@@ -509,18 +508,19 @@ def train_dqn(
             observation = next_observation
 
         best_reward = max(best_reward, reward_sum)
-        if bool(info["success"]):
-            if best_successful_reward is None or reward_sum > best_successful_reward:
-                best_successful_reward = reward_sum
-                if output is not None:
-                    best_checkpoint = agent.save(
-                        output / "best_successful.pt",
-                        metadata={
-                            "episode": episode,
-                            "reward": reward_sum,
-                            "success": True,
-                        },
-                    )
+        if bool(info["success"]) and (
+            best_successful_reward is None or reward_sum > best_successful_reward
+        ):
+            best_successful_reward = reward_sum
+            if output is not None:
+                best_checkpoint = agent.save(
+                    output / "best_successful.pt",
+                    metadata={
+                        "episode": episode,
+                        "reward": reward_sum,
+                        "success": True,
+                    },
+                )
 
         if output is not None and (
             episode % config.checkpoint_every == 0 or episode == config.episodes
