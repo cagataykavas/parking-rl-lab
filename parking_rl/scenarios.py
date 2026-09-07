@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 import numpy as np
 
@@ -158,7 +158,7 @@ def apply_scenario(
         )
         for obstacle in scenario.obstacles
     ]
-    return env._obs(), {  # noqa: SLF001 - fixture adapter intentionally materializes observation
+    return env._obs(), {
         "scenario": scenario.name,
         "description": scenario.description,
         "tags": list(scenario.tags),
