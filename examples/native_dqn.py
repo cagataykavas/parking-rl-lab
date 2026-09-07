@@ -7,8 +7,8 @@ from pathlib import Path
 
 from parking_env_v2 import ParkingEnvV2, ParkingV2Config
 from parking_rl.agents.dqn import (
-    DQNConfig,
     DoubleDQNAgent,
+    DQNConfig,
     evaluate_dqn,
     train_dqn,
 )
