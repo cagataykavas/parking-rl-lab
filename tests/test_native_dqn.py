@@ -5,17 +5,17 @@ from pathlib import Path
 import numpy as np
 import pytest
 import torch
-import torch.nn as nn
+from torch import nn
 
+from parking_env_v2 import ParkingEnvV2, ParkingV2Config
 from parking_rl.agents.dqn import (
-    DQNConfig,
     DoubleDQNAgent,
+    DQNConfig,
     DuelingQNetwork,
     ReplayBatch,
     ReplayBuffer,
     evaluate_dqn,
 )
-from parking_env_v2 import ParkingEnvV2, ParkingV2Config
 
 
 def tiny_config(**overrides) -> DQNConfig:
