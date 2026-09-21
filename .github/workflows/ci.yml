@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Ruff
-        run: ruff check parking_env.py parking_env_v2.py curriculum.py train.py train_v2.py parking_rl examples tests
+        run: ruff check parking_env.py parking_env_v2.py curriculum.py train.py train_v2.py policy_release_gate.py parking_rl examples tests
       - name: Pytest
         run: pytest -q
       - name: Smoke check training profiles
