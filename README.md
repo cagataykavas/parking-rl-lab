@@ -140,3 +140,30 @@ GitHub Actions runs Ruff, environment/collision/LIDAR tests and builds each algo
 ## Provenance
 
 This is a personal parking-RL project reconstructed and reorganized from earlier personal development work. The repository uses synthetic geometry and contains no employer code, data or scenarios.
+
+
+## Risk-aware policy release gate
+
+`policy_release_gate.py` converts episode-level evaluation evidence into a deterministic promotion decision. It prevents a strong aggregate score from hiding a weak curriculum level, an unlucky seed, excessive collisions or poor lower-tail returns.
+
+```python
+from policy_release_gate import EpisodeResult, ReleasePolicy, evaluate_policy_release
+
+report = evaluate_policy_release(
+    episodes,
+    ReleasePolicy(
+        min_episodes_per_level=20,
+        min_success_rate=0.70,
+        min_level_success_rate=0.55,
+        max_collision_rate=0.05,
+        min_worst_seed_success_rate=0.50,
+        tail_fraction=0.10,
+        min_tail_mean_return=-50.0,
+    ),
+)
+assert report["decision"] == "promote"
+```
+
+Each `EpisodeResult` is keyed by the evaluation seed and curriculum level. The gate rejects missing levels, duplicate seed/level evidence, impossible success/collision combinations and non-finite returns. Its JSON-ready report contains aggregate, level and seed metrics plus machine-readable rejection reasons.
+
+Thresholds are operational policy, not statistical guarantees. They must be calibrated against a frozen evaluation protocol and real safety costs. A small deterministic seed set can still miss rare failures; for a production vehicle stack this gate should complement scenario coverage, confidence intervals, simulator-to-real validation and independent safety review rather than authorize deployment by itself.
